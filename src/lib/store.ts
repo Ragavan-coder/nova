@@ -61,6 +61,35 @@ export function useBlockchainStore() {
   const [batches, setBatches] = useState<VaccineBatch[]>(() => loadFromStorage());
   const failedAttemptsRef = useRef(0);
   const workflowViolationsRef = useRef(0);
+
+  // On mount: fetch batches from backend and merge with localStorage
+  useEffect(() => {
+    const syncFromBackend = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/batches`);
+        const data = await res.json();
+        if (data.success && Array.isArray(data.batches) && data.batches.length > 0) {
+          setBatches(prev => {
+            const localMap = new Map(prev.map(b => [b.batchId, b]));
+            for (const serverBatch of data.batches) {
+              const local = localMap.get(serverBatch.batchId);
+              // Use whichever version has more events (= more progress in the supply chain)
+              if (!local || serverBatch.events.length > local.events.length) {
+                localMap.set(serverBatch.batchId, serverBatch);
+              }
+            }
+            const merged = Array.from(localMap.values());
+            saveToStorage(merged);
+            return merged;
+          });
+        }
+      } catch (err) {
+        console.error('Failed to sync batches from backend:', err);
+      }
+    };
+    syncFromBackend();
+  }, []);
+
   // Listen to cross-tab storage changes
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {

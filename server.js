@@ -55,6 +55,27 @@ app.post('/api/batch', (req, res) => {
   }
 });
 
+// Retrieve ALL batches (used by frontend to sync state on page load)
+app.get('/api/batches', (req, res) => {
+  try {
+    const fileContent = fs.readFileSync(BATCHES_FILE, 'utf8');
+    const batchesObj = JSON.parse(fileContent);
+    // Filter out duplicates (masterTransactionId aliases point to same batch)
+    const seen = new Set();
+    const batchList = [];
+    for (const batch of Object.values(batchesObj)) {
+      if (batch.batchId && !seen.has(batch.batchId)) {
+        seen.add(batch.batchId);
+        batchList.push(batch);
+      }
+    }
+    res.status(200).json({ success: true, batches: batchList });
+  } catch (err) {
+    console.error('[BACKEND] Error fetching all batches:', err);
+    res.status(500).json({ success: false, batches: [] });
+  }
+});
+
 // Retrieve batch data (used by mobile QR scan when localStorage is empty)
 app.get('/api/batch/:id', (req, res) => {
   try {
