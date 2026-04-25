@@ -65,8 +65,23 @@ export default function HospitalForm({ store, onSuccess }: { store: ReturnType<t
         body: JSON.stringify({ role: 'Hospital', batchId: formData.lotId, hash, signature })
       });
 
-      store.addEventToBatch(formData.lotId, 'DELIVERED', formData.location, parseFloat(formData.currentTemp) || 4.0, 'Hospital node');
+      const temp = parseFloat(formData.currentTemp) || 4.0;
+      store.addEventToBatch(formData.lotId, 'DELIVERED', formData.location, temp, 'Hospital node');
       
+      if (temp < 2 || temp > 8) {
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.lotId,
+              medicineName: 'Unknown (Check Blockchain)',
+              reason: `Temperature breach detected: ${temp}°C is outside the safe 2-8°C range.`,
+              location: formData.location || 'Hospital Portal'
+            })
+          });
+        } catch (e) {}
+      }
       // Generate Master Transaction ID
       try {
         const res = await fetch(`${API_BASE}/api/master-hash`, {

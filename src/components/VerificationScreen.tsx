@@ -43,6 +43,24 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
         console.error('Failed to fetch batch from server', err);
       }
     }
+
+    if (!result) {
+      if (store.incrementFailedAttempts()) {
+        store.resetFailedAttempts();
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: searchQuery.trim() || 'UNKNOWN_BATCH',
+              medicineName: 'Unknown',
+              reason: 'Multiple brute-force verification attempts detected.',
+              location: 'Public Verification Portal'
+            })
+          });
+        } catch (e) {}
+      }
+    }
     
     setSearchedBatch(result);
     setHasSearched(true);

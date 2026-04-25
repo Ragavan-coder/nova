@@ -85,8 +85,34 @@ export default function PatientForm({ store, onSuccess }: { store: ReturnType<ty
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.lotId.trim()) { alert('Lot/Batch ID is required.'); return; }
-    if (!formData.patientId.trim()) { alert('Patient ID is required.'); return; }
+    setWorkflowError('');
+
+    const handleFailure = async (msg: string) => {
+      setWorkflowError(msg);
+      if (store.incrementFailedAttempts()) {
+        store.resetFailedAttempts();
+        setWorkflowError("⛔ TAMPER ALERT TRIGGERED: Too many failed attempts. Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.lotId || 'UNKNOWN_BATCH',
+              medicineName: formData.vaccineName || 'Unknown Medicine',
+              reason: 'Multiple failed validation/workflow attempts detected.',
+              location: 'Patient Portal'
+            })
+          });
+        } catch (err) {}
+      }
+    };
+
+    const { valid: sv, errors: se } = validateForm(formData as any, PATIENT_SCHEMA);
+    if (!sv) { await handleFailure(`⛔ ${se[0].message}`); return; }
+
+    const err = store.validateWorkflowStep(formData.lotId, 'DELIVERED', 'ADMINISTERED');
+    if (err) { await handleFailure(`⛔ ${err}`); return; }
+
     setIsSubmitting(true);
     try {
       const { privateKey } = generateKeyPair();
@@ -100,7 +126,7 @@ export default function PatientForm({ store, onSuccess }: { store: ReturnType<ty
       store.addEventToBatch(formData.lotId, 'ADMINISTERED', 'Local Clinic', 4.0, 'Patient node');
       setIsSubmitting(false);
       setIsSuccess(true);
-      setTimeout(() => onSuccess(), 2000);
+      // Removed auto-redirect so it stays on the page until logout
     } catch (err) { console.error(err); setIsSubmitting(false); }
   };
 
