@@ -15,7 +15,9 @@ export const MedicineQR: React.FC<MedicineQRProps> = ({
 }) => {
   if (!batchId) return <div>No provenance data available.</div>;
 
-  const verificationUrl = `${window.location.origin}/?batchId=${batchId}`;
+  // Use deployed Vercel URL in production, fallback to local for dev
+  const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+  const verificationUrl = `${baseUrl}/?batchId=${batchId}`;
 
   return (
     <motion.div 
