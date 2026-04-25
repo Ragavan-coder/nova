@@ -111,7 +111,26 @@ export default function PatientForm({ store, onSuccess }: { store: ReturnType<ty
     if (!sv) { await handleFailure(`⛔ ${se[0].message}`); return; }
 
     const err = store.validateWorkflowStep(formData.lotId, 'DELIVERED', 'ADMINISTERED');
-    if (err) { await handleFailure(`⛔ ${err}`); return; }
+    if (err) {
+      setWorkflowError(`⛔ ${err}`);
+      if (store.incrementWorkflowViolation()) {
+        store.resetWorkflowViolation();
+        setWorkflowError("🚨 TAMPER ALERT: Unauthorized workflow bypass attempt detected! Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.lotId || 'UNKNOWN_BATCH',
+              medicineName: formData.vaccineName || 'Unknown Medicine',
+              reason: `Patient attempted to record dose for batch "${formData.lotId}" without prior Hospital delivery approval. This is a workflow bypass attempt.`,
+              location: 'Patient Portal'
+            })
+          });
+        } catch (e) {}
+      }
+      return;
+    }
 
     setIsSubmitting(true);
     try {

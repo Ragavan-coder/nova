@@ -52,7 +52,23 @@ export default function ManufacturerForm({ store, onSuccess }: { store: ReturnTy
 
     // ── Strict Rule: No duplicate batch numbers ─────────────
     if (store.batchExists(formData.batchNumber)) {
-      await handleFailure(`⛔ Batch ID "${formData.batchNumber}" already exists on the blockchain. Duplicate entries are not allowed.`);
+      setWorkflowError(`⛔ Batch ID "${formData.batchNumber}" already exists on the blockchain. Duplicate entries are not allowed.`);
+      if (store.incrementWorkflowViolation()) {
+        store.resetWorkflowViolation();
+        setWorkflowError("🚨 TAMPER ALERT: Duplicate batch injection attempt detected! Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.batchNumber,
+              medicineName: formData.vaccineName || 'Unknown Medicine',
+              reason: `Manufacturer attempted to create duplicate batch "${formData.batchNumber}" that already exists on the blockchain. Possible counterfeit injection attempt.`,
+              location: 'Manufacturer Portal'
+            })
+          });
+        } catch (e) {}
+      }
       return;
     }
     if (!formData.batchNumber.trim()) {

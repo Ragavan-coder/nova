@@ -60,6 +60,7 @@ const saveToStorage = (batches: VaccineBatch[]) => {
 export function useBlockchainStore() {
   const [batches, setBatches] = useState<VaccineBatch[]>(() => loadFromStorage());
   const failedAttemptsRef = useRef(0);
+  const workflowViolationsRef = useRef(0);
   // Listen to cross-tab storage changes
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -123,6 +124,16 @@ export function useBlockchainStore() {
 
   const resetFailedAttempts = useCallback(() => {
     failedAttemptsRef.current = 0;
+  }, []);
+
+  /** Workflow violation: trying to submit without previous step approved (max 2) */
+  const incrementWorkflowViolation = useCallback(() => {
+    workflowViolationsRef.current += 1;
+    return workflowViolationsRef.current >= 2;
+  }, []);
+
+  const resetWorkflowViolation = useCallback(() => {
+    workflowViolationsRef.current = 0;
   }, []);
 
   const addEventToBatch = useCallback((batchId: string, type: EventType, location: string, temperature: number, actor: string) => {
@@ -239,6 +250,8 @@ export function useBlockchainStore() {
     eligibleForHospital,
     validateWorkflowStep,
     incrementFailedAttempts,
-    resetFailedAttempts
+    resetFailedAttempts,
+    incrementWorkflowViolation,
+    resetWorkflowViolation
   };
 }

@@ -51,7 +51,26 @@ export default function DistributorForm({ store, onSuccess }: { store: ReturnTyp
 
     // ── Strict Rule: Validate workflow order ─────────────────
     const err = store.validateWorkflowStep(formData.lotId, 'CREATED', 'SHIPPED');
-    if (err) { await handleFailure(`⛔ ${err}`); return; }
+    if (err) {
+      setWorkflowError(`⛔ ${err}`);
+      if (store.incrementWorkflowViolation()) {
+        store.resetWorkflowViolation();
+        setWorkflowError("🚨 TAMPER ALERT: Unauthorized workflow bypass attempt detected! Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.lotId || 'UNKNOWN_BATCH',
+              medicineName: 'Unknown Medicine',
+              reason: `Distributor attempted to ship batch "${formData.lotId}" without prior Manufacturer approval. This is a workflow bypass attempt.`,
+              location: 'Distributor Portal'
+            })
+          });
+        } catch (e) {}
+      }
+      return;
+    }
 
     setIsSubmitting(true);
     try {

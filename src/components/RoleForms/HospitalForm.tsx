@@ -51,7 +51,26 @@ export default function HospitalForm({ store, onSuccess }: { store: ReturnType<t
 
     // ── Strict Rule: Validate workflow order ─────────────────
     const err = store.validateWorkflowStep(formData.lotId, 'SHIPPED', 'DELIVERED');
-    if (err) { await handleFailure(`⛔ ${err}`); return; }
+    if (err) {
+      setWorkflowError(`⛔ ${err}`);
+      if (store.incrementWorkflowViolation()) {
+        store.resetWorkflowViolation();
+        setWorkflowError("🚨 TAMPER ALERT: Unauthorized workflow bypass attempt detected! Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.lotId || 'UNKNOWN_BATCH',
+              medicineName: 'Unknown Medicine',
+              reason: `Hospital attempted to accept delivery of batch "${formData.lotId}" without prior Distributor shipment approval. This is a workflow bypass attempt.`,
+              location: 'Hospital Portal'
+            })
+          });
+        } catch (e) {}
+      }
+      return;
+    }
 
     setIsSubmitting(true);
     try {
