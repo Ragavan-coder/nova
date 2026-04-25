@@ -23,20 +23,40 @@ export default function ManufacturerForm({ store, onSuccess }: { store: ReturnTy
     e.preventDefault();
     setWorkflowError('');
 
+    const handleFailure = async (msg: string) => {
+      setWorkflowError(msg);
+      if (store.incrementFailedAttempts()) {
+        store.resetFailedAttempts();
+        setWorkflowError("⛔ TAMPER ALERT TRIGGERED: Too many failed attempts. Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.batchNumber || 'UNKNOWN_BATCH',
+              medicineName: formData.vaccineName || 'Unknown Medicine',
+              reason: 'Multiple failed validation/workflow attempts detected.',
+              location: 'Manufacturer Portal'
+            })
+          });
+        } catch (err) {}
+      }
+    };
+
     // ── Full schema validation ────────────────────────────
     const { valid, errors } = validateForm(formData as any, MANUFACTURER_SCHEMA);
     if (!valid) {
-      setWorkflowError(errors[0].message);
+      handleFailure(`⛔ ${errors[0].message}`);
       return;
     }
 
     // ── Strict Rule: No duplicate batch numbers ─────────────
     if (store.batchExists(formData.batchNumber)) {
-      setWorkflowError(`⛔ Batch ID "${formData.batchNumber}" already exists on the blockchain. Duplicate entries are not allowed.`);
+      handleFailure(`⛔ Batch ID "${formData.batchNumber}" already exists on the blockchain. Duplicate entries are not allowed.`);
       return;
     }
     if (!formData.batchNumber.trim()) {
-      setWorkflowError('⛔ Batch Number is required.');
+      handleFailure('⛔ Batch Number is required.');
       return;
     }
 

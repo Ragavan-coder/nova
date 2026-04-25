@@ -59,7 +59,7 @@ const saveToStorage = (batches: VaccineBatch[]) => {
 
 export function useBlockchainStore() {
   const [batches, setBatches] = useState<VaccineBatch[]>(() => loadFromStorage());
-
+  const [failedAttempts, setFailedAttempts] = useState(0);
   // Listen to cross-tab storage changes
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -114,6 +114,16 @@ export function useBlockchainStore() {
       return updated;
     });
     return newBatchId;
+  }, []);
+
+  const incrementFailedAttempts = useCallback(() => {
+    const newCount = failedAttempts + 1;
+    setFailedAttempts(newCount);
+    return newCount >= 3;
+  }, [failedAttempts]);
+
+  const resetFailedAttempts = useCallback(() => {
+    setFailedAttempts(0);
   }, []);
 
   const addEventToBatch = useCallback((batchId: string, type: EventType, location: string, temperature: number, actor: string) => {
@@ -220,6 +230,7 @@ export function useBlockchainStore() {
   return {
     batches,
     stats,
+    failedAttempts,
     addBatch,
     addEventToBatch,
     setMasterTransactionId,
@@ -229,5 +240,7 @@ export function useBlockchainStore() {
     eligibleForDistributor,
     eligibleForHospital,
     validateWorkflowStep,
+    incrementFailedAttempts,
+    resetFailedAttempts
   };
 }

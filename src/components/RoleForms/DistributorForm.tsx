@@ -25,13 +25,33 @@ export default function DistributorForm({ store, onSuccess }: { store: ReturnTyp
     e.preventDefault();
     setWorkflowError('');
 
+    const handleFailure = async (msg: string) => {
+      setWorkflowError(msg);
+      if (store.incrementFailedAttempts()) {
+        store.resetFailedAttempts();
+        setWorkflowError("⛔ TAMPER ALERT TRIGGERED: Too many failed attempts. Security notified.");
+        try {
+          await fetch(`${API_BASE}/api/tamper-alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              batchId: formData.lotId || 'UNKNOWN_BATCH',
+              medicineName: 'Unknown Medicine',
+              reason: 'Multiple failed validation/workflow attempts detected.',
+              location: 'Distributor Portal'
+            })
+          });
+        } catch (err) {}
+      }
+    };
+
     // ── Schema validation ──────────────────────────────────
     const { valid: sv, errors: se } = validateForm(formData as any, DISTRIBUTOR_SCHEMA);
-    if (!sv) { setWorkflowError(se[0].message); return; }
+    if (!sv) { handleFailure(`⛔ ${se[0].message}`); return; }
 
     // ── Strict Rule: Validate workflow order ─────────────────
     const err = store.validateWorkflowStep(formData.lotId, 'CREATED', 'SHIPPED');
-    if (err) { setWorkflowError(`⛔ ${err}`); return; }
+    if (err) { handleFailure(`⛔ ${err}`); return; }
 
     setIsSubmitting(true);
     try {
