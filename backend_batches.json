@@ -27,5 +27,141 @@
         }
       }
     ]
+  },
+  "BCH-2026-73UE": {
+    "batchId": "BCH-2026-73UE",
+    "name": "hgvv",
+    "manufacturer": "gg",
+    "expiryDate": "2026-04-28",
+    "createdAt": 1777080604979,
+    "currentStatus": "TAMPERED",
+    "events": [
+      {
+        "txId": "0xd562ea21653c3227bb891b7a2320f962708f205c08e2bf4c983af69fad149c1b",
+        "timestamp": 1777080604979,
+        "type": "CREATED",
+        "location": "Origin Facility",
+        "temperature": 7,
+        "actor": "Manufacturer node",
+        "certificate": {
+          "certId": "CERT-MAN-D8:B4:FE",
+          "commonName": "Manufacturer Peer CA",
+          "issuedBy": "Nova-MFG-CA",
+          "role": "Manufacturer",
+          "publicKey": "60:11:17:1F:FE:C2:7D:C4:A2:C9:2B:B7",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:30:04.979Z",
+          "signatureValid": true,
+          "approvedAt": 1777080604979
+        }
+      },
+      {
+        "txId": "0xc61572985f26c7f26515a1679d1e6f0c967440c1d6b0904beb97c643a266ae5d",
+        "timestamp": 1777080736853,
+        "type": "SHIPPED",
+        "location": "cheeni",
+        "temperature": 4.5,
+        "actor": "Distributor node",
+        "certificate": {
+          "certId": "CERT-DIS-8E:D3:52",
+          "commonName": "Distributor Peer CA",
+          "issuedBy": "Nova-DIST-CA",
+          "role": "Distributor",
+          "publicKey": "A6:67:42:BF:1A:0E:20:49:AC:9F:FA:37",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:32:16.853Z",
+          "signatureValid": true,
+          "approvedAt": 1777080736853
+        }
+      },
+      {
+        "txId": "0x086dfab7d1e3a1e27b74a5f710d21eb1a0b8566740adcd6097a9ec08ffa78f63",
+        "timestamp": 1777080821444,
+        "type": "DELIVERED",
+        "location": "cheeni",
+        "temperature": 666,
+        "actor": "Hospital node",
+        "certificate": {
+          "certId": "CERT-HOS-5A:4B:DF",
+          "commonName": "Hospital Approval CA",
+          "issuedBy": "Nova-HOSP-CA",
+          "role": "Hospital",
+          "publicKey": "A8:AB:15:5F:EE:FF:81:CA:FF:70:1C:C7",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:33:41.444Z",
+          "signatureValid": false,
+          "approvedAt": 1777080821444
+        }
+      }
+    ],
+    "masterTransactionId": "082454997dec185d4dd891c1b5a165d7b2f1c1b2f682c7ec6df2fd80bf55b44d"
+  },
+  "082454997dec185d4dd891c1b5a165d7b2f1c1b2f682c7ec6df2fd80bf55b44d": {
+    "batchId": "BCH-2026-73UE",
+    "name": "hgvv",
+    "manufacturer": "gg",
+    "expiryDate": "2026-04-28",
+    "createdAt": 1777080604979,
+    "currentStatus": "TAMPERED",
+    "events": [
+      {
+        "txId": "0xd562ea21653c3227bb891b7a2320f962708f205c08e2bf4c983af69fad149c1b",
+        "timestamp": 1777080604979,
+        "type": "CREATED",
+        "location": "Origin Facility",
+        "temperature": 7,
+        "actor": "Manufacturer node",
+        "certificate": {
+          "certId": "CERT-MAN-D8:B4:FE",
+          "commonName": "Manufacturer Peer CA",
+          "issuedBy": "Nova-MFG-CA",
+          "role": "Manufacturer",
+          "publicKey": "60:11:17:1F:FE:C2:7D:C4:A2:C9:2B:B7",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:30:04.979Z",
+          "signatureValid": true,
+          "approvedAt": 1777080604979
+        }
+      },
+      {
+        "txId": "0xc61572985f26c7f26515a1679d1e6f0c967440c1d6b0904beb97c643a266ae5d",
+        "timestamp": 1777080736853,
+        "type": "SHIPPED",
+        "location": "cheeni",
+        "temperature": 4.5,
+        "actor": "Distributor node",
+        "certificate": {
+          "certId": "CERT-DIS-8E:D3:52",
+          "commonName": "Distributor Peer CA",
+          "issuedBy": "Nova-DIST-CA",
+          "role": "Distributor",
+          "publicKey": "A6:67:42:BF:1A:0E:20:49:AC:9F:FA:37",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:32:16.853Z",
+          "signatureValid": true,
+          "approvedAt": 1777080736853
+        }
+      },
+      {
+        "txId": "0x086dfab7d1e3a1e27b74a5f710d21eb1a0b8566740adcd6097a9ec08ffa78f63",
+        "timestamp": 1777080821444,
+        "type": "DELIVERED",
+        "location": "cheeni",
+        "temperature": 666,
+        "actor": "Hospital node",
+        "certificate": {
+          "certId": "CERT-HOS-5A:4B:DF",
+          "commonName": "Hospital Approval CA",
+          "issuedBy": "Nova-HOSP-CA",
+          "role": "Hospital",
+          "publicKey": "A8:AB:15:5F:EE:FF:81:CA:FF:70:1C:C7",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:33:41.444Z",
+          "signatureValid": false,
+          "approvedAt": 1777080821444
+        }
+      }
+    ],
+    "masterTransactionId": "082454997dec185d4dd891c1b5a165d7b2f1c1b2f682c7ec6df2fd80bf55b44d"
   }
 }
