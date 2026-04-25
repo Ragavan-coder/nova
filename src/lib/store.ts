@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { VaccineBatch, BlockchainEvent, StatusType, EventType, CertificateProof } from './types';
 
 const STORAGE_KEY = 'nova_blockchain_ledger_v3';
@@ -59,7 +59,7 @@ const saveToStorage = (batches: VaccineBatch[]) => {
 
 export function useBlockchainStore() {
   const [batches, setBatches] = useState<VaccineBatch[]>(() => loadFromStorage());
-  const [failedAttempts, setFailedAttempts] = useState(0);
+  const failedAttemptsRef = useRef(0);
   // Listen to cross-tab storage changes
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -117,13 +117,12 @@ export function useBlockchainStore() {
   }, []);
 
   const incrementFailedAttempts = useCallback(() => {
-    const newCount = failedAttempts + 1;
-    setFailedAttempts(newCount);
-    return newCount >= 3;
-  }, [failedAttempts]);
+    failedAttemptsRef.current += 1;
+    return failedAttemptsRef.current >= 3;
+  }, []);
 
   const resetFailedAttempts = useCallback(() => {
-    setFailedAttempts(0);
+    failedAttemptsRef.current = 0;
   }, []);
 
   const addEventToBatch = useCallback((batchId: string, type: EventType, location: string, temperature: number, actor: string) => {
@@ -230,7 +229,6 @@ export function useBlockchainStore() {
   return {
     batches,
     stats,
-    failedAttempts,
     addBatch,
     addEventToBatch,
     setMasterTransactionId,
