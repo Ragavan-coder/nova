@@ -63,6 +63,52 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
     }
   };
 
+  const handleDownloadCertificate = () => {
+    if (!searchedBatch) return;
+    
+    const certEvent = searchedBatch.events[searchedBatch.events.length - 1];
+    const cert = certEvent.certificate;
+    
+    let content = `====================================================\n`;
+    content += `         PROJECT NOVA IMMUTABLE CERTIFICATE         \n`;
+    content += `====================================================\n\n`;
+    content += `MEDICINE: ${searchedBatch.name}\n`;
+    content += `BATCH ID: ${searchedBatch.batchId}\n`;
+    content += `MANUFACTURER: ${searchedBatch.manufacturer}\n`;
+    content += `EXPIRY DATE: ${new Date(searchedBatch.expiryDate).toLocaleDateString()}\n`;
+    content += `STATUS: ${searchedBatch.currentStatus}\n\n`;
+    
+    if (searchedBatch.masterTransactionId) {
+      content += `MASTER TRANSACTION ID (SHA-256): \n${searchedBatch.masterTransactionId}\n\n`;
+    }
+    
+    if (cert) {
+      content += `--- DIGITAL SIGNATURE (HYPERLEDGER FABRIC CA) ---\n`;
+      content += `CERTIFICATE ID: ${cert.certId}\n`;
+      content += `ISSUED BY: ${cert.issuedBy}\n`;
+      content += `COMMON NAME: ${cert.commonName}\n`;
+      content += `ALGORITHM: ${cert.signatureAlgo}\n`;
+      content += `PUBLIC KEY: ${cert.publicKey}\n`;
+      content += `VALID UNTIL: ${new Date(cert.validUntil).toLocaleDateString()}\n`;
+      content += `SIGNATURE VALID: ${cert.signatureValid ? 'YES' : 'NO'}\n`;
+    }
+    
+    content += `\n====================================================\n`;
+    content += `This document is cryptographically verifiable on the \n`;
+    content += `Project NOVA Blockchain Network.\n`;
+    content += `====================================================\n`;
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Certificate_${searchedBatch.batchId}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col flex-1 h-full">
       {/* Search Bar */}
@@ -185,7 +231,7 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
                   </p>
                 </div>
               </div>
-              <button className="px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors w-full md:w-auto flex justify-center items-center gap-2 shadow-sm">
+              <button onClick={handleDownloadCertificate} className="px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors w-full md:w-auto flex justify-center items-center gap-2 shadow-sm">
                 <FileText className="w-4 h-4" /> View Certificate
               </button>
             </div>
