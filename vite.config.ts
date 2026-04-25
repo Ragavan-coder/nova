@@ -21,7 +21,7 @@ export default defineConfig(({mode}) => {
       hmr: process.env.DISABLE_HMR !== 'true',
       allowedHosts: true,
       watch: {
-        ignored: ['**/backend_hashes.json']
+        ignored: ['**/backend_hashes.json', '**/backend_batches.json']
       },
       proxy: {
         '/api': {

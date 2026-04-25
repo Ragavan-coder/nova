@@ -46,17 +46,17 @@ export default function ManufacturerForm({ store, onSuccess }: { store: ReturnTy
     // ── Full schema validation ────────────────────────────
     const { valid, errors } = validateForm(formData as any, MANUFACTURER_SCHEMA);
     if (!valid) {
-      handleFailure(`⛔ ${errors[0].message}`);
+      await handleFailure(`⛔ ${errors[0].message}`);
       return;
     }
 
     // ── Strict Rule: No duplicate batch numbers ─────────────
     if (store.batchExists(formData.batchNumber)) {
-      handleFailure(`⛔ Batch ID "${formData.batchNumber}" already exists on the blockchain. Duplicate entries are not allowed.`);
+      await handleFailure(`⛔ Batch ID "${formData.batchNumber}" already exists on the blockchain. Duplicate entries are not allowed.`);
       return;
     }
     if (!formData.batchNumber.trim()) {
-      handleFailure('⛔ Batch Number is required.');
+      await handleFailure('⛔ Batch Number is required.');
       return;
     }
 

@@ -47,11 +47,11 @@ export default function HospitalForm({ store, onSuccess }: { store: ReturnType<t
 
     // ── Schema validation ──────────────────────────────────
     const { valid: sv, errors: se } = validateForm(formData as any, HOSPITAL_SCHEMA);
-    if (!sv) { handleFailure(`⛔ ${se[0].message}`); return; }
+    if (!sv) { await handleFailure(`⛔ ${se[0].message}`); return; }
 
     // ── Strict Rule: Validate workflow order ─────────────────
     const err = store.validateWorkflowStep(formData.lotId, 'SHIPPED', 'DELIVERED');
-    if (err) { handleFailure(`⛔ ${err}`); return; }
+    if (err) { await handleFailure(`⛔ ${err}`); return; }
 
     setIsSubmitting(true);
     try {

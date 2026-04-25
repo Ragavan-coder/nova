@@ -47,11 +47,11 @@ export default function DistributorForm({ store, onSuccess }: { store: ReturnTyp
 
     // ── Schema validation ──────────────────────────────────
     const { valid: sv, errors: se } = validateForm(formData as any, DISTRIBUTOR_SCHEMA);
-    if (!sv) { handleFailure(`⛔ ${se[0].message}`); return; }
+    if (!sv) { await handleFailure(`⛔ ${se[0].message}`); return; }
 
     // ── Strict Rule: Validate workflow order ─────────────────
     const err = store.validateWorkflowStep(formData.lotId, 'CREATED', 'SHIPPED');
-    if (err) { handleFailure(`⛔ ${err}`); return; }
+    if (err) { await handleFailure(`⛔ ${err}`); return; }
 
     setIsSubmitting(true);
     try {
