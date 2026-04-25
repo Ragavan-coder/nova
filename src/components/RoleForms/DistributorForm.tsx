@@ -69,7 +69,7 @@ export default function DistributorForm({ store, onSuccess }: { store: ReturnTyp
 
       setIsSubmitting(false);
       setIsSuccess(true);
-      setTimeout(() => onSuccess(), 2500);
+      // Removed auto-redirect so it stays on the page until logout
     } catch (err) {
       console.error(err);
       setIsSubmitting(false);

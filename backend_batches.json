@@ -1,0 +1,31 @@
+{
+  "BCH-2026-EBAZ": {
+    "batchId": "BCH-2026-EBAZ",
+    "name": "b vhv",
+    "manufacturer": "hhjbb",
+    "expiryDate": "2026-04-28",
+    "createdAt": 1777078844495,
+    "currentStatus": "TAMPERED",
+    "events": [
+      {
+        "txId": "0x49ea167e7cb8cf4e538f0b3117be165b67a1a1cb4cf30ba1e94f0f86dbbda60f",
+        "timestamp": 1777078844495,
+        "type": "CREATED",
+        "location": "Origin Facility",
+        "temperature": 777888888,
+        "actor": "Manufacturer node",
+        "certificate": {
+          "certId": "CERT-MAN-EF:62:2A",
+          "commonName": "Manufacturer Peer CA",
+          "issuedBy": "Nova-MFG-CA",
+          "role": "Manufacturer",
+          "publicKey": "14:2B:E4:FA:A3:DE:74:94:8E:13:90:3A",
+          "signatureAlgo": "ECDSA-P256",
+          "validUntil": "2027-04-25T01:00:44.495Z",
+          "signatureValid": true,
+          "approvedAt": 1777078844495
+        }
+      }
+    ]
+  }
+}

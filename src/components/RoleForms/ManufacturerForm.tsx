@@ -76,8 +76,7 @@ export default function ManufacturerForm({ store, onSuccess }: { store: ReturnTy
       setCreatedBatchId(newId);
       setIsSubmitting(false);
       setIsSuccess(true);
-
-      setTimeout(() => onSuccess(newId), 2000);
+      // Removed auto-redirect so it stays on the page until logout
     } catch (err) {
       console.error(err);
       setIsSubmitting(false);
