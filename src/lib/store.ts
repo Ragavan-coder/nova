@@ -69,16 +69,17 @@ export function useBlockchainStore() {
         const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/batches`);
         const data = await res.json();
         if (data.success && Array.isArray(data.batches) && data.batches.length > 0) {
+          const serverBatches = data.batches as VaccineBatch[];
           setBatches(prev => {
-            const localMap = new Map(prev.map(b => [b.batchId, b]));
-            for (const serverBatch of data.batches) {
+            const localMap = new Map<string, VaccineBatch>(prev.map(b => [b.batchId, b]));
+            for (const serverBatch of serverBatches) {
               const local = localMap.get(serverBatch.batchId);
               // Use whichever version has more events (= more progress in the supply chain)
               if (!local || serverBatch.events.length > local.events.length) {
                 localMap.set(serverBatch.batchId, serverBatch);
               }
             }
-            const merged = Array.from(localMap.values());
+            const merged: VaccineBatch[] = Array.from(localMap.values());
             saveToStorage(merged);
             return merged;
           });
