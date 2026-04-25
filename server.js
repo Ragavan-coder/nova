@@ -14,8 +14,17 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
-// Allow requests from Vercel (or anywhere during dev)
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://nova-vkrx.vercel.app',
+    'https://nova-iodj.vercel.app',
+    /\.vercel\.app$/
+  ],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 
 const isVercel = process.env.VERCEL === '1';
 const storageDir = isVercel ? '/tmp' : __dirname;
