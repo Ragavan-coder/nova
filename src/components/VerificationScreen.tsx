@@ -10,6 +10,7 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedBatch, setSearchedBatch] = useState<VaccineBatch | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -27,6 +28,7 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
     e.preventDefault();
     if (!searchQuery.trim()) return;
     
+    setIsSearching(true);
     let result = store.verifyBatch(searchQuery.trim());
     
     // Fallback for mobile devices scanning QR codes (won't have local storage data)
@@ -44,6 +46,7 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
     
     setSearchedBatch(result);
     setHasSearched(true);
+    setIsSearching(false);
 
     if (result && result.currentStatus === 'TAMPERED') {
       try {
@@ -131,9 +134,14 @@ export default function VerificationScreen({ store }: { store: ReturnType<typeof
             <button 
               id="verify-search-btn"
               type="submit"
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-colors shadow-sm text-lg"
+              disabled={isSearching}
+              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-2xl font-bold transition-colors shadow-sm text-lg flex items-center justify-center min-w-[140px]"
             >
-              Verify
+              {isSearching ? (
+                <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                "Verify"
+              )}
             </button>
           </form>
           
